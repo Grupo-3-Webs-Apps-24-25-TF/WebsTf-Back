@@ -242,7 +242,6 @@ const updatePassword = async (req, res) => {
 
     if (!userBody.password || !userBody.userId) {
         return res.status(400).json({
-            "status": "error",
             "message": "Faltan datos"
         });
     }
