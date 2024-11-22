@@ -187,11 +187,38 @@ const update = async (req, res) => {
     });
 }
 
+const getEventsByDay = (req, res) => {
+    let date = req.query.date;
+
+    if (!date) {
+        return res.status(400).json({
+            "message": "Faltan datos"
+        });
+    }
+
+    Event.find({ date: date }).then(events => {
+        if (events.length == 0) {
+            return res.status(404).json({
+                "mensaje": "No se han encontrado eventos"
+            });
+        }
+
+        return res.status(200).json({
+            events
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "message": "Error while finding events"
+        });
+    });
+}
+
 module.exports = {
     createFromUser,
     createFromAdmin,
     deleteEvent,
     approveEvent,
     getEventsStandBy,
-    update
+    update,
+    getEventsByDay
 }
