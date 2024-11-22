@@ -161,10 +161,37 @@ const getEventsStandBy = (req, res) => {
     });
 }
 
+const update = async (req, res) => {
+    let eventBody = req.body;
+
+    if (req.user.role == "Usuario") {
+        return res.status(400).json({
+            "message": "Rol Incorrecto, vuelva a iniciar sesión"
+        });
+    }
+
+    Event.findOneAndUpdate({ _id: eventBody._id }, eventBody, { new: true }).then(eventUpdated => {
+        if (!eventUpdated) {
+            return res.status(404).json({
+                "mensaje": "Event not found"
+            });
+        }
+        
+        return res.status(200).send({
+            "event": eventUpdated
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "mensaje": "Error while finding and updating event"
+        });
+    });
+}
+
 module.exports = {
     createFromUser,
     createFromAdmin,
     deleteEvent,
     approveEvent,
-    getEventsStandBy
+    getEventsStandBy,
+    update
 }

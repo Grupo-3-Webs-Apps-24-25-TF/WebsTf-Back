@@ -9,5 +9,6 @@ router.post("/post-admin", check.auth, EventController.createFromAdmin);
 router.delete("/", check.auth, EventController.deleteEvent);
 router.put("/approve", check.auth, EventController.approveEvent);
 router.get("/stand-by", check.auth, EventController.getEventsStandBy);
+router.put("/", check.auth, EventController.update);
 
 module.exports = router;

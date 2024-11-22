@@ -119,10 +119,11 @@ const update = async (req, res) => {
                 "mensaje": "User not found"
             });
         }
+        
         return res.status(200).send({
             "user": userUpdated
         });
-    }).catch((e) => {
+    }).catch(() => {
         return res.status(404).json({
             "mensaje": "Error while finding and updating user"
         });
