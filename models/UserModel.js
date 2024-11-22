@@ -7,6 +7,9 @@ const UserSchema = Schema({
     lastName: {
         type: String
     },
+    email: {
+        type: String
+    },
     username: {
         type: String
     },
@@ -18,6 +21,9 @@ const UserSchema = Schema({
         default: "Usuario"
     },
     category: {
+        type: String
+    },
+    verificationCode: {
         type: String
     }
 });
