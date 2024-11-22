@@ -137,7 +137,7 @@ const login = (req, res) => {
 }
 
 const myUser = (req, res) => {
-    User.findById(req.user.id).select().then(user => {
+    User.findById(req.user.id).then(user => {
         return res.status(200).json({
             user
         });
