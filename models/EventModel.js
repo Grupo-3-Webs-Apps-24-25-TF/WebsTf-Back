@@ -34,7 +34,11 @@ const EventSchema = Schema({
     },
     status: {
         type: String,
-        default: "Pendiente de aprobación"
+        default: "Pendiente"
+    },
+    approver: {
+        type: Schema.ObjectId,
+        ref: "User"
     }
 });
 

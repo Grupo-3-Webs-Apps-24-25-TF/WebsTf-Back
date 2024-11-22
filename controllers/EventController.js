@@ -121,7 +121,7 @@ const approveEvent = (req, res) => {
         });
     }
 
-    Event.findOneAndUpdate({ _id: eventId }, { status: "Aprobado" }, { new: true }).then(eventUpdated => {
+    Event.findOneAndUpdate({ _id: eventId }, { status: "Aprobado", approver: req.user.id }, { new: true }).then(eventUpdated => {
         if (!eventUpdated) {
             return res.status(404).json({
                 "message": "No event found"
