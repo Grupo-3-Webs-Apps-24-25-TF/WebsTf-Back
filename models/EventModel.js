@@ -33,7 +33,8 @@ const EventSchema = Schema({
         ref: "User"
     },
     status: {
-        type: String
+        type: String,
+        default: "Pendiente de aprobación"
     }
 });
 

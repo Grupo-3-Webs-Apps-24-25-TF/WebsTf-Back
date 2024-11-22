@@ -15,6 +15,8 @@ app.use(express.json());
 
 const UserRoutes = require("./routes/UserRoutes");
 app.use("/api/users", UserRoutes);
+const EventRoutes = require("./routes/EventRoutes");
+app.use("/api/events", EventRoutes);
 
 app.get("/test-route", (_req, res) => {
     return res.status(200).json({

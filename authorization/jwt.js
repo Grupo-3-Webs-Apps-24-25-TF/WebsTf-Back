@@ -6,6 +6,7 @@ const secret = "Secret_Key_Webs_TF_022506";
 const createToken = (user) => {
     const payLoad = {
         id: user._id,
+        role: user.role,
         exp: moment().add(30, "days").unix()
     };
 
