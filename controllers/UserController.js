@@ -2,6 +2,9 @@ const User = require("../models/UserModel");
 
 const bcrypt = require("bcrypt");
 const jwt = require("../authorization/jwt");
+const Resend = require("resend");
+
+const resend = new Resend.Resend(process.env.RESEND_KEY);
 
 const register = async (req, res) => {
     let userBody = req.body;
@@ -151,10 +154,125 @@ const deleteUser = (req, res) => {
     });
 }
 
+const sendCode = async (req, res) => {
+    let userBody = req.body;
+
+    if (!userBody.email) {
+        return res.status(400).json({
+            "message": "Faltan datos"
+        });
+    }
+
+    try {
+        const user = await User.findOne({ email: userBody.email });
+
+        if (!user) {
+            return res.status(400).json({
+                "message": "No existe usuario con ese correo registrado"
+            });
+        }
+
+        let code = Math.floor(100000 + Math.random() * 900000);
+        let emailTemplate = "<p>Hola,</p>" + 
+        "<p>Alguien ha solicitado una nueva contraseña para la cuenta asociada a este correo.</p>" + 
+        "<p>No se ha hecho ningun cambio aún.</p>" + 
+        "<p>Si haz sido tú, ingresa este código de verificación en la aplicación:</p>" + 
+        "<p>" + code + "</p>" + 
+        "<br><br><br>" + 
+        "<p>Este correo se encuentra desatendido.<p/>" + 
+        "<p>Saludos desde el equipo de seguridad de Deliva.</p>";
+
+        const { error } = await resend.emails.send({
+            from: "forget-password-deliva@socialsynergy.pe",
+            to: userBody.email,
+            subject: "Código de verificación",
+            html: emailTemplate
+        });
+        
+        if (error) {
+            return res.status(400).json({
+                "message": "Error while sending verification code"
+            });
+        }
+
+        User.findOneAndUpdate({ _id: user._id }, { verificationCode: code }, { new: true }).then(userUpdated => {
+            return res.status(200).json({
+                "message": "Email sended successfully"
+            });
+        }).catch(() => {
+            return res.status(404).json({
+                "mensaje": "Error while finding and updating user"
+            });
+        });
+    } catch {
+        return res.status(500).json({
+            "message": "Error while finding user"
+        });
+    }
+}
+
+const verifyCode = (req, res) => {
+    let userBody = req.body;
+
+    if (!userBody.verificationCode || !userBody.userId) {
+        return res.status(400).json({
+            "message": "Faltan datos"
+        });
+    }
+
+    User.findOne({ "_id": userBody.userId, "verificationCode": userBody.verificationCode }).then(user => {
+        if (!user) {
+            return res.status(404).json({
+                "message": "Código incorrecto"
+            });
+        }
+
+        return res.status(200).json({
+            "message": "Code confirmed successfully"
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "message": "Error while finding user"
+        });
+    });
+}
+
+const updatePassword = async (req, res) => {
+    let userBody = req.body;
+
+    if (!userBody.password || !userBody.userId) {
+        return res.status(400).json({
+            "status": "error",
+            "message": "Faltan datos"
+        });
+    }
+
+    let pwd = await bcrypt.hash(userBody.password, 10);
+
+    User.findOneAndUpdate({ _id: userBody.userId }, { password: pwd }, { new: true }).then(userUpdated => {
+        if (!userUpdated) {
+            return res.status(404).json({
+                "mensaje": "User not found"
+            });
+        }
+
+        return res.status(200).send({
+            "message": "Password updated succesfully"
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "mensaje": "Error while finding and updating user"
+        });
+    });
+}
+
 module.exports = {
     register,
     login,
     myUser,
     update,
-    deleteUser
+    deleteUser,
+    sendCode,
+    verifyCode,
+    updatePassword
 }
