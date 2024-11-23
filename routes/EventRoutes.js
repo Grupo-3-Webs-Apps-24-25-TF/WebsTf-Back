@@ -11,5 +11,7 @@ router.put("/approve", check.auth, EventController.approveEvent);
 router.get("/stand-by", check.auth, EventController.getEventsStandBy);
 router.put("/", check.auth, EventController.update);
 router.get("/getByDay", EventController.getEventsByDay);
+router.get("/getByWeek", EventController.getEventsFromWeek);
+router.get("/getByMonth", EventController.getEventsUntilMonth);
 
 module.exports = router;

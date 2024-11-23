@@ -213,6 +213,91 @@ const getEventsByDay = (req, res) => {
     });
 }
 
+const getEventsFromWeek = (_req, res) => {
+    let minDate = new Date();
+    minDate.setHours(0, 0, 0, 0);
+    let maxDate = new Date();
+    maxDate.setHours(23, 59, 59, 999);
+    maxDate.setDate(maxDate.getDate() + 6);
+
+    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+    Event.find({ date: {
+        $gte: minDate,
+        $lte: maxDate
+    }}).sort('date').then(events => {
+        if (events.length == 0) {
+            return res.status(404).json({
+                "mensaje": "No se han encontrado eventos"
+            });
+        }
+
+        const groupedEvents = events.reduce((accumulator, event) => {
+            const day = event.date.toISOString().split('T')[0];
+            const dayName = daysOfWeek[event.date.getDay()];
+            const index = `${dayName} ${day}`;
+            
+            if (!accumulator[index]){
+                accumulator[index] = [];
+            }
+
+            accumulator[index].push(event);
+
+            return accumulator;
+        }, {});
+
+        return res.status(200).json({
+            groupedEvents
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "message": "Error while finding events"
+        });
+    });
+}
+
+const getEventsUntilMonth = (_req, res) => {
+    let minDate = new Date();
+    minDate.setHours(0, 0, 0, 0);
+    let maxDate = new Date(minDate.getFullYear(), minDate.getMonth() + 1, 0);
+    maxDate.setHours(23, 59, 59, 999);
+
+    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+    Event.find({ date: {
+        $gte: minDate,
+        $lte: maxDate
+    }}).sort('date').then(events => {
+        if (events.length == 0) {
+            return res.status(404).json({
+                "mensaje": "No se han encontrado eventos"
+            });
+        }
+
+        const groupedEvents = events.reduce((accumulator, event) => {
+            const day = event.date.toISOString().split('T')[0];
+            const dayName = daysOfWeek[event.date.getDay()];
+            const index = `${dayName} ${day}`;
+            
+            if (!accumulator[index]){
+                accumulator[index] = [];
+            }
+
+            accumulator[index].push(event);
+
+            return accumulator;
+        }, {});
+
+        return res.status(200).json({
+            groupedEvents
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "message": "Error while finding events"
+        });
+    });
+}
+
 module.exports = {
     createFromUser,
     createFromAdmin,
@@ -220,5 +305,7 @@ module.exports = {
     approveEvent,
     getEventsStandBy,
     update,
-    getEventsByDay
+    getEventsByDay,
+    getEventsFromWeek,
+    getEventsUntilMonth
 }
