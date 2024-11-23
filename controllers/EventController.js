@@ -1,5 +1,8 @@
 const Event = require("../models/EventModel");
 
+const cloudinary = require('cloudinary');
+const fs = require('fs');
+
 const createFromUser = async (req, res) => {
     let eventBody = req.body;
 
@@ -298,6 +301,46 @@ const getEventsUntilMonth = (_req, res) => {
     });
 }
 
+const updateImage = async (req, res) => {
+    let eventId = req.body.eventId;
+
+    if (!req.file || !eventId) {
+        fs.unlinkSync(req.file.path);
+        
+        return res.status(400).json({
+            message: 'No se subió ninguna imagen.'
+        });
+    }
+
+    try {
+        const response = await cloudinary.v2.uploader.upload(req.file.path, { public_id: eventId });
+
+        fs.unlinkSync(req.file.path);
+
+        Event.findOneAndUpdate({ _id: eventId }, { image: response.url }, { new: true }).then(eventUpdated => {
+            if (!eventUpdated) {
+                return res.status(404).json({
+                    "mensaje": "Event not found"
+                });
+            }
+            
+            return res.status(200).send({
+                "event": eventUpdated
+            });
+        }).catch(() => {
+            return res.status(500).json({
+                "status": "error",
+                "mensaje": "Error while finding and updating product"
+            });
+        });
+    } catch (error) {
+        fs.unlinkSync(req.file.path);
+        return res.status(500).json({
+            "mensaje": "Error while updating image"
+        });
+    }
+}
+
 module.exports = {
     createFromUser,
     createFromAdmin,
@@ -307,5 +350,6 @@ module.exports = {
     update,
     getEventsByDay,
     getEventsFromWeek,
-    getEventsUntilMonth
+    getEventsUntilMonth,
+    updateImage
 }
