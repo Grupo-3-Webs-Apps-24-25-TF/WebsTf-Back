@@ -12,5 +12,6 @@ router.delete("/", check.auth, UserController.deleteUser);
 router.post("/sendCode", UserController.sendCode);
 router.post("/verifyCode", UserController.verifyCode);
 router.put("/updatePassword", UserController.updatePassword);
+router.get("/getByUsername", UserController.getByUsername);
 
 module.exports = router;

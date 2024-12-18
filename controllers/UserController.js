@@ -252,7 +252,7 @@ const updatePassword = async (req, res) => {
     User.findOneAndUpdate({ _id: userBody.userId }, { password: pwd }, { new: true }).then(userUpdated => {
         if (!userUpdated) {
             return res.status(404).json({
-                "mensaje": "User not found"
+                "message": "User not found"
             });
         }
 
@@ -261,7 +261,25 @@ const updatePassword = async (req, res) => {
         });
     }).catch(() => {
         return res.status(404).json({
-            "mensaje": "Error while finding and updating user"
+            "message": "Error while finding and updating user"
+        });
+    });
+}
+
+const getByUsername = (req, res) => {
+    User.findOne({ username: req.query.username}).then(user => {
+        if (!user) {
+            return res.status(404).json({
+                "message": "Usuario no existe"
+            });
+        }
+
+        return res.status(200).json({
+            user
+        });
+    }).catch(() => {
+        return res.status(404).json({
+            "message": "Error while finding user"
         });
     });
 }
@@ -274,5 +292,6 @@ module.exports = {
     deleteUser,
     sendCode,
     verifyCode,
-    updatePassword
+    updatePassword,
+    getByUsername
 }
