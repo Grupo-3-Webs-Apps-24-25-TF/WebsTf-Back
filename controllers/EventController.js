@@ -6,7 +6,7 @@ const fs = require('fs');
 const createFromUser = async (req, res) => {
     let eventBody = req.body;
 
-    if (!eventBody.title || !eventBody.description || !eventBody.image || !eventBody.category || !eventBody.date ||
+    if (!eventBody.title || !eventBody.description || !eventBody.category || !eventBody.date ||
         !eventBody.hourStarting || !eventBody.hourEnding || !eventBody.location || !eventBody.registerLink
     ) {
         return res.status(400).json({
