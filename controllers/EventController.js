@@ -147,7 +147,7 @@ const getEventsStandBy = (req, res) => {
         });
     }
 
-    Event.find({ status: "Pendiente de aprobación" }).then(events => {
+    Event.find({ status: "Pendiente de aprobación" }).populate('user').then(events => {
         if (events.length == 0) {
             return res.status(404).json({
                 "mensaje": "No se han encontrado eventos pendientes"
@@ -199,7 +199,7 @@ const getEventsByDay = (req, res) => {
         });
     }
 
-    Event.find({ date: date }).then(events => {
+    Event.find({ date: date }).populate('user').then(events => {
         if (events.length == 0) {
             return res.status(404).json({
                 "mensaje": "No se han encontrado eventos"
@@ -228,7 +228,7 @@ const getEventsFromWeek = (_req, res) => {
     Event.find({ date: {
         $gte: minDate,
         $lte: maxDate
-    }}).sort('date').then(events => {
+    }}).populate('user').sort('date').then(events => {
         if (events.length == 0) {
             return res.status(404).json({
                 "mensaje": "No se han encontrado eventos"
@@ -270,7 +270,7 @@ const getEventsUntilMonth = (_req, res) => {
     Event.find({ date: {
         $gte: minDate,
         $lte: maxDate
-    }}).sort('date').then(events => {
+    }}).populate('user').sort('date').then(events => {
         if (events.length == 0) {
             return res.status(404).json({
                 "mensaje": "No se han encontrado eventos"
