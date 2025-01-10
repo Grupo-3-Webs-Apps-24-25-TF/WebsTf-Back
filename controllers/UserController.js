@@ -198,7 +198,8 @@ const sendCode = async (req, res) => {
 
         User.findOneAndUpdate({ _id: user._id }, { verificationCode: code }, { new: true }).then(userUpdated => {
             return res.status(200).json({
-                "message": "Email sended successfully"
+                "message": "Email sended successfully",
+                "id": userUpdated._id
             });
         }).catch(() => {
             return res.status(404).json({
